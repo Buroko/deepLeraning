@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Noan's browser</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="icon" href="logo.png" type="image/x-icon">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            text-align: justify;
+            background-image: url("images.png");
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        img {
+            margin-top: 0%;
+            margin-bottom: 5px;
+            color: black;
+        }
+
+        .left-container,
+        .right-container {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 30px;
+            margin: 20px;
+            flex: 1;
+            width: 550px;
+            height: 350px;
+            background-color: #48C9B0;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .content-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .upload-form,
+        .search-form {
+            margin-bottom: 20px;
+        }
+
+        .upload-form label,
+        .result-label {
+            font-weight: bold;
+            color: black;
+        }
+
+        .upload-form input[type="file"],
+        select[name="search_option"] {
+            margin-top: 10px;
+        }
+
+        .image-preview {
+            max-width: 400px;
+            margin-bottom: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-button,
+        .upload-form input[type="submit"] {
+            padding: 12px 21px;
+            background-color: #48C9B0;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+           
+        }
+
+        .search-button:hover,
+        .upload-form input[type="submit"]:hover {
+            background-color: #58D8C1;
+        }
+
+        .search-button:active,
+        .upload-form input[type="submit"]:active {
+            background-color: #000000;
+            box-shadow: none;
+        }
+
+        .search-button:focus,
+        .upload-form input[type="submit"]:focus {
+            outline: none;
+        }
+
+        select[name="search_option"] {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        select[name="search_option"] option {
+            padding: 5px;
+        }
+
+        .search-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 20px 0;
+            background-color: #000000;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-form p 
+        {
+            color: white;
+        }
+
+        .record-button ,
+        .predict-button{
+        padding: 12px 21px;
+        background-color: black;
+        color: white;
+        border: none;
+        cursor: pointer;
+        margin-top: 50px;
+        transition: background-color 0.3s ease;
+        border-radius: 5px;
+    }
+
+    .record-button i {
+        margin-right: 5px;
+    }
+    h2 {
+        font-size: 24px;
+        font-weight: bold;
+        color: black;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    </style>
+    
+</head>
+<body>
+    <div class="container">
+        <!-- <h1>Noan</h1> -->
+        <img src="logo.png" alt="Logo" width="250" height="200">
+        <div class="content-container">
+            <div class="left-container">
+                <h2>Picture Section</h2>
+                <hr>
+                <form class="upload-form" method="POST" enctype="multipart/form-data">
+                    <i class="fas fa-upload"></i> Upload Picture
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <input type="file" id="image" name="image" accept="image/*">
+                    <button class="predict-button" type="submit">
+                        <i class="fas fa-image"></i> Predict
+                    </button>
+                    
+                </form>
+
+                {% if image_path %}
+                    <div class="image-preview">
+                        <img src="{{ image_path }}" alt="Image Preview" width="300">
+                        <div class="result-label"  style="text-align: center;">Class :{{ predicted_class }}</div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="right-container">
+                <h2>Audio Section</h2>
+                <hr>
+                <form class="upload-form" method="POST" enctype="multipart/form-data">
+                    <i class="fas fa-upload"></i> Upload audio
+                    <!-- <label for="audio">Record audio :</label> -->
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <input type="file" id="audio" name="audio" accept="audio/*">
+                    <button class="record-button" type="submit">
+                        <i class="fas fa-microphone"></i> Record
+                    </button>
+                </form>
+
+                {% if audio_query %}
+                    <div class="result-label" style="text-align: center;">Recognized audio: {{ audio_query }}</div>
+                {% endif %}
+            </div>
+        </div>
+        <form method="POST" action="/search">
+              <input type="hidden" name="query" value="{{ predicted_class or audio_query }}">
+              <select name="search_option">
+                <option value="1">Image Search</option>
+                <option value="2">Site Search</option>
+              </select>
+              <button class="search-button" type="submit">
+                <i class="fas fa-search"></i> Search
+              </button>
+            </form>
+        <div class="search-form">
+                <p style="text-align: center;">&copy; Anas & Noura</p>
+        </div>
+</body>
+</html>
+
